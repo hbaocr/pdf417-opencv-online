@@ -4,6 +4,7 @@
 #https://github.com/ChenjieXu/pyzxing
 #https://yushulx.medium.com/how-to-use-python-zxing-and-python-zbar-on-windows-10-610b741c845a
 #https://github.com/zxing/zxing/issues/836
+# nho decode them file goc
 import os
 import sys
 import json
@@ -24,11 +25,20 @@ def parseDecodeResult(results):
         "code":"",
         "format":"NODATA"
     }
+    #print(results)
     for r in results:
-        if 'raw' in r[0]:
-            result["code"] =r[0]['raw']
-            result["format"] =r[0]['format']
-            return result
+        
+        print(isinstance(r,list),type(r))
+        if isinstance(r,list):
+            if 'raw' in r[0]:
+                result["code"] =r[0]['raw']
+                result["format"] =r[0]['format']
+                return result
+        else:
+            if 'raw' in r:
+                result["code"] =r['raw']
+                result["format"] =r['format']
+                return result
 
     return result
 
@@ -50,7 +60,7 @@ class PDF417LocatorHTTPRequestHandler(BaseHTTPRequestHandler):
             ret={
                 "data":"",
                 "status":"OK",
-                "details":"OK"
+                "details":""
             }
 
             try:
@@ -66,7 +76,7 @@ class PDF417LocatorHTTPRequestHandler(BaseHTTPRequestHandler):
                     for i in range(l):
                         fpath=os.path.join(directory,str(i)+".jpg")
                         pdf417Locator.saveBuff2Jpg(pdf417_zones[i],fpath)
-                        #print(fpath)
+                        print(fpath)
                     if l>0:
                         batch_jpg=os.path.join(directory,"*.jpg")
                         results = reader.decode(batch_jpg)
