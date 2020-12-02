@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  pythonopencvzxing:
+    #get Dockerfile from './' folder
+    build: ./
+    environment:
+      - SERVER_PORT=3000
+    ports:
+      - "3000:3000"

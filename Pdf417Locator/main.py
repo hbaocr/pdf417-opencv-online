@@ -10,4 +10,7 @@ import httpService
 
 # this means that if this script is executed, then  main() will be executed
 if __name__ == '__main__':
-    httpService.run()
+    value = os.getenv("SERVER_PORT", "3000")
+    port=int(value)
+    print('http server run on port: ',port)
+    httpService.run("0.0.0.0",port)

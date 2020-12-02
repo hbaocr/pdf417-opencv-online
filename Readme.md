@@ -1,14 +1,18 @@
 
-## Install python3 and opencv
+## Build Image
 
-```
-# current version of opencv is 4.4.0
-pip3 install --upgrade pip setuptools wheel
-pip3 install numpy opencv-python
-```
+* Option 1: `Run from dockerfile`
+    ```
+        ./rundocker.sh 
+    ```
+* Option 2: `Run from docker-compose`
+    ```
+        ./rundockerCompose.sh 
+    ```
 
-docker run -d -p 80:80 docker/getting-started
+## Test API
+* `Decode The PDF417 Image:` 
+![Decode](doc/postManEx_decode.png)
 
-https://github.com/hbaocr/python-zxing
-
-
+* `Service Healthcheck:` 
+![HealthCheck](doc/PostManHealthCheck.png)
