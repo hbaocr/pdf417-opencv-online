@@ -1,17 +1,16 @@
-
-#https://gist.github.com/mdonkers/63e115cc0c79b4f6b8b3a6b797e485c7
-#https://blog.tecladocode.com/python-30-day-21-multiple-files/
-#https://github.com/ChenjieXu/pyzxing
-#https://yushulx.medium.com/how-to-use-python-zxing-and-python-zbar-on-windows-10-610b741c845a
-#https://github.com/zxing/zxing/issues/836
-# nho decode them file goc
+#https://pymotw.com/2/BaseHTTPServer/index.html#module-BaseHTTPServer
+"""
+HTTPServer in httpService.py is a simple subclass of SocketServer.TCPServer, and does not use multiple threads or processes to handle requests. 
+To add threading or forking, create a new class using the appropriate mix-in from SocketServer.
+"""
 import os
 import sys
 import json
 import tempfile
 import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
-
+from socketserver import ThreadingMixIn
+import threading
 from pyzxing import BarCodeReader
 reader = BarCodeReader()
 
@@ -23,7 +22,7 @@ import pdf417Locator
 
 def getMiliSecond():
     millis = int(round(time.time() * 1000))
-
+    return millis
 
 def parseDecodeResult(results):
     result ={
@@ -47,8 +46,13 @@ def parseDecodeResult(results):
 
     return result
 
-class PDF417LocatorHTTPRequestHandler(BaseHTTPRequestHandler):
+class Handler(BaseHTTPRequestHandler):
+    
     def do_GET(self):
+        
+        message =  threading.currentThread().getName()
+        print('Handle Req on thread',message)
+
         if self.path == '/healthcheck':
             self.send_response(200)
             #self.send_header("Set-Cookie", "foo=bar")
@@ -59,8 +63,14 @@ class PDF417LocatorHTTPRequestHandler(BaseHTTPRequestHandler):
             #self.send_header("Set-Cookie", "foo=bar")
             self.end_headers()
             self.wfile.write(json.dumps({'status':'FAIL','detail':'URL not supported'}).encode('utf8'))
+       
+        return
 
     def do_POST(self):
+        message =  threading.currentThread().getName()
+        print('================> Start Decode PDF417 on thread',message)
+
+        start = getMiliSecond()
         if self.path == '/decodeImg':
             ret={
                 "data":"",
@@ -81,7 +91,7 @@ class PDF417LocatorHTTPRequestHandler(BaseHTTPRequestHandler):
                     for i in range(l):
                         fpath=os.path.join(directory,str(i)+".jpg")
                         pdf417Locator.saveBuff2Jpg(pdf417_zones[i],fpath)
-                        print(fpath)
+                        #print(fpath)
                     if l>0:
                         batch_jpg=os.path.join(directory,"*.jpg")
                         results = reader.decode(batch_jpg)
@@ -106,9 +116,13 @@ class PDF417LocatorHTTPRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({'status':'FAIL','detail':'URL not supported'}).encode('utf8'))
 
+        period = getMiliSecond()-start
+        print('Finish Decode PDF417 on thread',message," in ",period,"ms")
+
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    """Handle requests in a separate thread."""
+
+
 def run(addr='0.0.0.0',port=3000):
-    httpd = HTTPServer((addr, port), PDF417LocatorHTTPRequestHandler)
-    httpd.serve_forever()
-
-#run()
-
+    server = ThreadedHTTPServer((addr, port), Handler)
+    server.serve_forever()
