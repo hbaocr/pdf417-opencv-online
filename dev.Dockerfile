@@ -14,7 +14,7 @@ RUN apt-get update --fix-missing && \
 
 RUN mkdir -p /app
 
-COPY ./Pdf417Locator /app
+# COPY ./Pdf417Locator /app
 
 # current contex of app
 WORKDIR /app

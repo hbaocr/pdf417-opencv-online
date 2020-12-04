@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  pythonopencvzxing:
+    #get Dockerfile from './' folder
+    build:
+        context: .
+        dockerfile: dev.Dockerfile
+    volumes:
+      - ./Pdf417Locator:/app
+    ports:
+      - "4000:3000"
