@@ -8,7 +8,7 @@ RUN apt-get update --fix-missing && \
     apt-get install -y openjdk-8-jdk && \
     apt-get -y install python3 python3-pip && \
     pip3 install --upgrade pip setuptools wheel && \
-    pip3 install flask flask-cors numpy pyzxing opencv-python
+    pip3 install flask flask-cors numpy joblib opencv-python
 
 # Copy the source into inside docker ( /app)
 
