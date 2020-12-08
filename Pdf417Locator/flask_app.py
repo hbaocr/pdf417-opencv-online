@@ -11,7 +11,8 @@ import time
 from flask import Flask, jsonify, request
 from flask_cors import cross_origin
 
-from pyzxing import BarCodeReader
+#from pyzxing import BarCodeReader
+from pdf417Reader import BarCodeReader
 import pdf417Locator
 
 reader = BarCodeReader()
@@ -70,6 +71,7 @@ def decode():
         post_data = request.get_data()
         gray = pdf417Locator.loadImgBuffer2Gray(post_data)
         pdf417_zones = pdf417Locator.locatePDF417(gray)
+        #pdf417_zones.append(gray)
         l = len(pdf417_zones)
         tmpdir = ""
         with tempfile.TemporaryDirectory() as directory:
@@ -82,6 +84,7 @@ def decode():
                 batch_jpg = os.path.join(directory, "*.jpg")
                 results = reader.decode(batch_jpg)
                 code = parseDecodeResult(results)
+                print('decode: ',code)
                 ret["data"] = code
     except OSError:
         ret["status"] = "FAIL"
